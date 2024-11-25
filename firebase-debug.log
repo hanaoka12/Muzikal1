@@ -1,0 +1,93 @@
+[debug] [2024-11-25T03:17:27.533Z] ----------------------------------------------------------------------
+[debug] [2024-11-25T03:17:27.540Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dell\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2024-11-25T03:17:27.541Z] CLI Version:   13.27.0
+[debug] [2024-11-25T03:17:27.541Z] Platform:      win32
+[debug] [2024-11-25T03:17:27.541Z] Node Version:  v20.18.0
+[debug] [2024-11-25T03:17:27.541Z] Time:          Mon Nov 25 2024 10:17:27 GMT+0700 (Indochina Time)
+[debug] [2024-11-25T03:17:27.542Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-11-25T03:17:27.553Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-11-25T03:17:27.554Z] > authorizing via signed-in user (hnd16122003@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\MusicPlayer3
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-11-25T03:17:57.549Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:17:57.549Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:17:57.573Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2024-11-25T03:18:09.376Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2024-11-25T03:18:09.376Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  Using project music-app-ee73e (Music App) 
+[info] 
+=== Functions Setup
+[debug] [2024-11-25T03:19:45.819Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-11-25T03:19:45.819Z] > authorizing via signed-in user (hnd16122003@gmail.com)
+[debug] [2024-11-25T03:19:45.820Z] [iam] checking project music-app-ee73e for permissions ["firebase.projects.get"]
+[debug] [2024-11-25T03:19:45.821Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:45.821Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:45.821Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/music-app-ee73e:testIamPermissions [none]
+[debug] [2024-11-25T03:19:45.821Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/music-app-ee73e:testIamPermissions x-goog-quota-user=projects/music-app-ee73e
+[debug] [2024-11-25T03:19:45.822Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/music-app-ee73e:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-11-25T03:19:57.964Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/music-app-ee73e:testIamPermissions 200
+[debug] [2024-11-25T03:19:57.964Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/music-app-ee73e:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-11-25T03:19:57.965Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:57.965Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:57.965Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:57.965Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:57.966Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-11-25T03:19:57.966Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/music-app-ee73e
+[debug] [2024-11-25T03:19:57.968Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/runtimeconfig.googleapis.com [none]
+[debug] [2024-11-25T03:19:57.969Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/music-app-ee73e
+[debug] [2024-11-25T03:19:59.347Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/runtimeconfig.googleapis.com 200
+[debug] [2024-11-25T03:19:59.348Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2024-11-25T03:19:59.350Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com 200
+[debug] [2024-11-25T03:19:59.350Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2024-11-25T03:19:59.351Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:59.351Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:19:59.351Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com:enable [none]
+[debug] [2024-11-25T03:19:59.351Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com:enable x-goog-quota-user=projects/music-app-ee73e
+[debug] [2024-11-25T03:19:59.959Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com:enable 200
+[debug] [2024-11-25T03:19:59.959Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com:enable [omitted]
+[debug] [2024-11-25T03:20:09.972Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:20:09.973Z] Checked if tokens are valid: true, expires at: 1732508227316
+[debug] [2024-11-25T03:20:09.973Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-11-25T03:20:09.973Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/music-app-ee73e
+[debug] [2024-11-25T03:20:22.540Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com 200
+[debug] [2024-11-25T03:20:22.541Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/music-app-ee73e/services/cloudfunctions.googleapis.com [omitted]
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+
+[info] +  Wrote functions/package.json 
+[info] +  Wrote functions/index.js 
+[info] +  Wrote functions/.gitignore 
+[info] 
+[info] i  Writing configuration info to firebase.json... 
+[info] i  Writing project information to .firebaserc... 
+[info] 
+[info] +  Firebase initialization complete! 
+[debug] [2024-11-25T03:21:43.927Z] Error: Timed out.
+    at Timeout._onTimeout (C:\Users\dell\AppData\Roaming\npm\node_modules\firebase-tools\lib\utils.js:269:49)
+    at listOnTimeout (node:internal/timers:581:17)
+    at process.processTimers (node:internal/timers:519:7)
+[error] 
+[error] Error: An unexpected error has occurred.

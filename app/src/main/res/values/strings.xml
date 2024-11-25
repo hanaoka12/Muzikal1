@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Muzikal</string>
+    <string-array name="genres_array">
+        <item>Pop</item>
+        <item>Rock</item>
+        <item>Jazz</item>
+        <item>Classical</item>
+        <item>Hip Hop</item>
+        <item>Electronic</item>
+        <item>Country</item>
+        <item>Reggae</item>
+        <item>Blues</item>
+        <item>Folk</item>
+    </string-array>
+</resources>
