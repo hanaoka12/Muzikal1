@@ -97,6 +97,7 @@ public class PlaylistDetailActivity extends AppCompatActivity implements
         MediaPlayerManager playerManager = MediaPlayerManager.getInstance();
         
         playerManager.setCurrentMusicInfo(
+                music.getMusicId(),
             music.getFileUrl(),
             music.getTitle(),
             music.getArtist(),

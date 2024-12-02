@@ -90,7 +90,7 @@ public class MiniPlayerManager {
                 MediaPlayerManager playerManager = MediaPlayerManager.getInstance();
                 if (playerManager != null && playerManager.getCurrentMusicUrl() != null) {
                     Music music = new Music(
-                            null,
+                        playerManager.getCurrentMusicId(),
                             playerManager.getCurrentMusicTitle(),
                             playerManager.getCurrentMusicArtist(),
                             playerManager.getCurrentMusicUrl(),

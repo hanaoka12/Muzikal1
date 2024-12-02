@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.nav_library) {
                 selectedFragment = new LibraryFragment();
             } else if (item.getItemId() == R.id.nav_upload) {
-                startActivity(new Intent(MainActivity.this, UploadMusicActivity.class));
-                return true;
+                selectedFragment = new com.example.musicplayer2.Fragment.UploadMusicFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }
@@ -75,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
+                return true;
             }
-            return true;
+            return false;
         });
     }
 

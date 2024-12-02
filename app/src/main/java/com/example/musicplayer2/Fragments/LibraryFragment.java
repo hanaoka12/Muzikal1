@@ -174,6 +174,7 @@ public class LibraryFragment extends Fragment implements
 
             // Set music info and play
             playerManager.setCurrentMusicInfo(
+                    selectedMusic.getMusicId(),
                     selectedMusic.getFileUrl(),
                     selectedMusic.getTitle(),
                     selectedMusic.getArtist(),

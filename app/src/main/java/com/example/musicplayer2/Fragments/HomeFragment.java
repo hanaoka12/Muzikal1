@@ -152,27 +152,7 @@ public class HomeFragment extends Fragment implements SliderAdapter.OnMusicClick
                 });
     }
 
-    private void loadRecommendedSongs() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseUtils.getUserRecommendations(userId, task -> {
-            if (task.isSuccessful()) {
-                List<Music> recommendedSongs = task.getResult();
-                if (recommendedSongs != null && !recommendedSongs.isEmpty()) {
-                    trendingMusicList.clear();
-                    trendingMusicList.addAll(recommendedSongs);
-                    trendingAdapter.notifyDataSetChanged();
-                } else {
-                    // No recommendations, load default trending songs
-                    loadTrendingSongs();
-                }
-            } else {
-                // Handle error
-                Log.e("HomeFragment", "Error fetching recommendations: ", task.getException());
-                // Optionally load default trending songs
-                loadTrendingSongs();
-            }
-        });
-    }
+
 
     @Override
     public void onMusicClick(Music music) {
@@ -180,7 +160,8 @@ public class HomeFragment extends Fragment implements SliderAdapter.OnMusicClick
         MediaPlayerManager playerManager = MediaPlayerManager.getInstance();
 
         playerManager.setCurrentMusicInfo(
-                music.getFileUrl(),
+        music.getMusicId(),        
+        music.getFileUrl(),
                 music.getTitle(),
                 music.getArtist(),
                 music.getImageUrl()

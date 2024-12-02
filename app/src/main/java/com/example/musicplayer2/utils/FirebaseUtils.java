@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.SetOptions;
@@ -261,108 +262,75 @@ public class FirebaseUtils {
 
     public static void getPlaylistSongs(String playlistId, OnCompleteListener<List<Music>> listener) {
         db.collection(PLAYLIST_COLLECTION).document(playlistId)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-                // Change from "songs" to "musicIds" to match the field name
-                List<String> musicIds = (List<String>) documentSnapshot.get("musicIds");
-                if (musicIds == null || musicIds.isEmpty()) {
-                    listener.onComplete(Tasks.forResult(new ArrayList<>()));
-                    return;
-                }
-
-                db.collection(MUSIC_COLLECTION)
-                    .whereIn("musicId", musicIds)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            List<Music> songs = new ArrayList<>();
-                            for (DocumentSnapshot doc : task.getResult()) {
-                                Music music = doc.toObject(Music.class);
-                                if (music != null) {
-                                    songs.add(music);
-                                }
-                            }
-                            listener.onComplete(Tasks.forResult(songs));
-                        } else {
-                            listener.onComplete(Tasks.forException(task.getException()));
-                        }
-                    });
-            })
-            .addOnFailureListener(e -> listener.onComplete(Tasks.forException(e)));
-    }
-
-    /**
-     * Logs user interactions with songs.
-     *
-     * @param userId The ID of the user.
-     * @param musicId The ID of the music.
-     */
-    public static void logUserInteraction(String userId, String musicId) {
-        DocumentReference userRef = db.collection("user_interactions").document(userId);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("interactions." + musicId, FieldValue.increment(1));
-
-        userRef.set(updates, SetOptions.merge())
-            .addOnSuccessListener(aVoid -> {
-                // Successfully logged interaction
-                Log.d(TAG, "User interaction logged for userId: " + userId + ", musicId: " + musicId);
-                generateRecommendations(listener);
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Error logging user interaction: ", e);
-            });
-    }
-
-    public static void generateRecommendations(OnCompleteListener<Void> listener) {
-        // Call the HTTP triggered Cloud Function
-        functions.getHttpsCallable("generateRecommendations")
-            .call()
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "Successfully triggered recommendations generation");
-                    listener.onComplete(Tasks.forResult(null));
-                } else {
-                    Log.e(TAG, "Failed to trigger recommendations generation", task.getException());
-                    listener.onComplete(Tasks.forException(task.getException()));
-                }
-            });
-    }
-    /**
-     * Retrieves user recommendations from Firestore.
-     *
-     * @param userId  The user's ID.
-     * @param listener  The listener to handle the result.
-     */
-    public static void getUserRecommendations(String userId, OnCompleteListener<List<Music>> listener) {
-        db.collection("user_recommendations")
-            .document(userId)
-            .get()
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot doc = task.getResult();
-                    if (doc != null && doc.exists()) {
-                        List<Map<String, Object>> recommendationsData = (List<Map<String, Object>>) doc.get("recommendations");
-                        List<Music> recommendations = new ArrayList<>();
-                        if (recommendationsData != null) {
-                            for (Map<String, Object> musicData : recommendationsData) {
-                                Music music = new Music();
-                                music.setMusicId((String) musicData.get("musicId"));
-                                music.setTitle((String) musicData.get("title"));
-                                music.setArtist((String) musicData.get("artist"));
-                                music.setFileUrl((String) musicData.get("fileUrl"));
-                                music.setImageUrl((String) musicData.get("imageUrl"));
-                                music.setGenre((String) musicData.get("genre"));
-                                // Set other fields if necessary
-                                recommendations.add(music);
-                            }
-                        }
-                        listener.onComplete(Tasks.forResult(recommendations));
-                    } else {
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    // Change from "songs" to "musicIds" to match the field name
+                    List<String> musicIds = (List<String>) documentSnapshot.get("musicIds");
+                    if (musicIds == null || musicIds.isEmpty()) {
                         listener.onComplete(Tasks.forResult(new ArrayList<>()));
+                        return;
                     }
-                } else {
-                    listener.onComplete(Tasks.forException(task.getException()));
-                }
-            });
+
+                    db.collection(MUSIC_COLLECTION)
+                            .whereIn("musicId", musicIds)
+                            .get()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    List<Music> songs = new ArrayList<>();
+                                    for (DocumentSnapshot doc : task.getResult()) {
+                                        Music music = doc.toObject(Music.class);
+                                        if (music != null) {
+                                            songs.add(music);
+                                        }
+                                    }
+                                    listener.onComplete(Tasks.forResult(songs));
+                                } else {
+                                    listener.onComplete(Tasks.forException(task.getException()));
+                                }
+                            });
+                })
+                .addOnFailureListener(e -> listener.onComplete(Tasks.forException(e)));
+    }
+
+    
+  
+
+
+    /**
+     * Adds a comment to a song.
+     *
+     * @param musicId The ID of the music.
+     * @param userId The ID of the user.
+     * @param userName The name of the user.
+     * @param comment The comment text.
+     * @param onCompleteListener Listener for when the operation is complete.
+     */
+    public static void addComment(String musicId, String userId, String userName, String comment, OnCompleteListener<Void> onCompleteListener) {
+        String commentId = db.collection("music").document(musicId).collection("comments").document().getId();
+
+        Map<String, Object> commentData = new HashMap<>();
+        commentData.put("commentId", commentId);
+        commentData.put("userId", userId);
+        commentData.put("userName", userName); // Include userName
+        commentData.put("comment", comment);
+        commentData.put("timestamp", FieldValue.serverTimestamp());
+
+        db.collection("music").document(musicId).collection("comments").document(commentId)
+            .set(commentData)
+            .addOnCompleteListener(onCompleteListener)
+            .addOnFailureListener(e -> Log.e(TAG, "Error adding comment: ", e));
+    }
+
+    /**
+     * Retrieves comments for a song.
+     *
+     * @param musicId The ID of the music.
+     * @param onCompleteListener Listener for when the operation is complete.
+     */
+    public static void getComments(String musicId, OnCompleteListener<QuerySnapshot> onCompleteListener) {
+        db.collection("music").document(musicId).collection("comments")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .get()
+            .addOnCompleteListener(onCompleteListener);
     }
 }

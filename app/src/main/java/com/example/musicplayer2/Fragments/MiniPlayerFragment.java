@@ -1,7 +1,5 @@
-// MiniPlayerFragment.java
 package com.example.musicplayer2.Fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,16 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.example.musicplayer2.Activity.PlayerActivity;
 import com.example.musicplayer2.R;
 import com.example.musicplayer2.models.Music;
 import com.example.musicplayer2.utils.MediaPlayerManager;
 
-public class MiniPlayerFragment extends Fragment {
+public class MiniPlayerFragment extends Fragment implements MediaPlayerManager.OnPlaybackStateChangeListener {
+
     private ImageView albumArtImageView;
     private TextView titleTextView, artistTextView;
     private ImageButton playPauseButton;
-    private View rootView;
     private MediaPlayerManager mediaPlayerManager;
     private boolean isPlaying = false;
     private RequestManager glideRequestManager;
@@ -44,71 +41,67 @@ public class MiniPlayerFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_mini_player, container, false);
-        initializeViews();
-        setupClickListeners();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_mini_player, container, false);
+        initializeViews(rootView);
+
+        // Initialize Glide RequestManager
+        glideRequestManager = Glide.with(this);
+
+        setupClickListeners(rootView);
         return rootView;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (getContext() != null) {
-            glideRequestManager = Glide.with(getContext().getApplicationContext());
-        }
-
-        if (pendingMusic != null) {
-            safeUpdateMusicInfo(pendingMusic);
-            pendingMusic = null;
-        }
-
-        setupMediaPlayerListener();
-    }
-
-    private void setupMediaPlayerListener() {
-        if (mediaPlayerManager != null) {
-            mediaPlayerManager.setOnPreparedListener(() -> {
-                isPlaying = true;
-                updatePlayPauseButtonState();
-            });
-        }
-    }
-
-    private void initializeViews() {
+    private void initializeViews(View rootView) {
         albumArtImageView = rootView.findViewById(R.id.mini_album_art);
         titleTextView = rootView.findViewById(R.id.mini_title);
         artistTextView = rootView.findViewById(R.id.mini_artist);
         playPauseButton = rootView.findViewById(R.id.mini_play_pause);
     }
 
-    private void setupClickListeners() {
+    private void setupClickListeners(View rootView) {
         if (playPauseButton != null) {
             playPauseButton.setOnClickListener(v -> handlePlayPauseClick());
         }
 
         if (rootView != null) {
-            rootView.setOnClickListener(v -> openPlayerActivity());
+            rootView.setOnClickListener(v -> openPlayerFragment());
         }
     }
 
     private void handlePlayPauseClick() {
         if (mediaPlayerManager != null) {
             mediaPlayerManager.togglePlayPause();
-            isPlaying = mediaPlayerManager.isPlaying();
-            updatePlayPauseButtonState();
+            // isPlaying will be updated via the listener
         }
     }
 
-    private void openPlayerActivity() {
-        if (getContext() != null && mediaPlayerManager != null) {
-            Intent intent = new Intent(getContext(), PlayerActivity.class);
-            intent.putExtra("MUSIC_URL", mediaPlayerManager.getCurrentMusicUrl());
-            intent.putExtra("MUSIC_TITLE", mediaPlayerManager.getCurrentMusicTitle());
-            intent.putExtra("MUSIC_ARTIST", mediaPlayerManager.getCurrentMusicArtist());
-            intent.putExtra("MUSIC_IMAGE", mediaPlayerManager.getCurrentImageUrl());
-            startActivity(intent);
+    private void openPlayerFragment() {
+        if (getActivity() != null && mediaPlayerManager != null) {
+            com.example.musicplayer2.Fragment.PlayerFragment playerFragment = new com.example.musicplayer2.Fragment.PlayerFragment();
+
+            
+            Bundle args = new Bundle();
+            args.putString("MUSIC_ID", mediaPlayerManager.getCurrentMusicId());
+            args.putString("MUSIC_URL", mediaPlayerManager.getCurrentMusicUrl());
+            args.putString("MUSIC_TITLE", mediaPlayerManager.getCurrentMusicTitle());
+            args.putString("MUSIC_ARTIST", mediaPlayerManager.getCurrentMusicArtist());
+            args.putString("MUSIC_IMAGE", mediaPlayerManager.getCurrentImageUrl());
+            playerFragment.setArguments(args);
+
+            // Show fragment with animation
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.animator.slide_in_up,
+                            R.animator.slide_out_up,
+                            R.animator.slide_in_down,
+                            R.animator.slide_out_down
+                    )
+                    .add(android.R.id.content, playerFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 
@@ -154,8 +147,7 @@ public class MiniPlayerFragment extends Fragment {
 
     private void updatePlayPauseButtonState() {
         mainHandler.post(() -> {
-            if (playPauseButton != null && mediaPlayerManager != null && isAdded()) {
-                isPlaying = mediaPlayerManager.isPlaying();
+            if (playPauseButton != null && isAdded()) {
                 playPauseButton.setImageResource(
                         isPlaying ? R.drawable.ic_pause_mini : R.drawable.ic_play_mini
                 );
@@ -163,9 +155,39 @@ public class MiniPlayerFragment extends Fragment {
         });
     }
 
+    // Implement the playback state change listener method
+    @Override
+    public void onPlaybackStateChanged(boolean isPlaying) {
+        this.isPlaying = isPlaying;
+        updatePlayPauseButtonState();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Register the listener
+        if (mediaPlayerManager != null) {
+            mediaPlayerManager.addOnPlaybackStateChangeListener(this);
+            // Update initial state
+            isPlaying = mediaPlayerManager.isPlaying();
+            updatePlayPauseButtonState();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unregister the listener
+        if (mediaPlayerManager != null) {
+            mediaPlayerManager.removeOnPlaybackStateChangeListener(this);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        // Update UI when fragment resumes
+        isPlaying = mediaPlayerManager.isPlaying();
         updatePlayPauseButtonState();
     }
 

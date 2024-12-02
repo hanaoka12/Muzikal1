@@ -10,6 +10,10 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.example.musicplayer2.Service.MusicService;
+import com.example.musicplayer2.models.Music;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MediaPlayerManager {
     private static final String TAG = "MediaPlayerManager";
@@ -22,14 +26,24 @@ public class MediaPlayerManager {
     private String currentMusicTitle;
     private String currentMusicArtist;
     private String currentImageUrl;
+    private String currentMusicId; 
     private Context context;
     private Intent serviceIntent;
+    private boolean isRepeatEnabled = false;
+
+    //  Playback State Change Listener Interface
+    public interface OnPlaybackStateChangeListener {
+        void onPlaybackStateChanged(boolean isPlaying);
+    }
+
+    // List to hold listeners
+    private final List<OnPlaybackStateChangeListener> playbackStateChangeListeners = new ArrayList<>();
 
     public interface OnPreparedListener {
         void onPrepared();
     }
 
-    // Private constructor
+    
     private MediaPlayerManager() {
         this.mediaPlayer = new MediaPlayer();
         setupMediaPlayer();
@@ -52,12 +66,38 @@ public class MediaPlayerManager {
             if (onPreparedListener != null) {
                 onPreparedListener.onPrepared();
             }
+            notifyPlaybackStateChange(true);
+        });
+
+        mediaPlayer.setOnCompletionListener(mp -> {
+            if (!isRepeatEnabled) {
+                notifyPlaybackStateChange(false);
+            }
         });
 
         mediaPlayer.setOnErrorListener((mp, what, extra) -> {
             Log.e(TAG, "MediaPlayer error: " + what + ", " + extra);
             return false;
         });
+    }
+
+    // Method to add a listener
+    public void addOnPlaybackStateChangeListener(OnPlaybackStateChangeListener listener) {
+        if (!playbackStateChangeListeners.contains(listener)) {
+            playbackStateChangeListeners.add(listener);
+        }
+    }
+
+    // Method to remove a listener
+    public void removeOnPlaybackStateChangeListener(OnPlaybackStateChangeListener listener) {
+        playbackStateChangeListeners.remove(listener);
+    }
+
+    // Notify all listeners about playback state change
+    private void notifyPlaybackStateChange(boolean isPlaying) {
+        for (OnPlaybackStateChangeListener listener : playbackStateChangeListeners) {
+            listener.onPlaybackStateChanged(isPlaying);
+        }
     }
 
     public void setOnPreparedListener(OnPreparedListener listener) {
@@ -78,9 +118,9 @@ public class MediaPlayerManager {
             mediaPlayer.setDataSource(context, Uri.parse(fileUrl));
             mediaPlayer.prepareAsync();
             currentMusicUrl = fileUrl;
-            shouldAutoPlay = true;  // Make sure this is true
+            shouldAutoPlay = true;  
 
-            // Start service
+            
             if (this.context != null && serviceIntent != null) {
                 this.context.startForegroundService(serviceIntent);
             }
@@ -89,12 +129,26 @@ public class MediaPlayerManager {
         }
     }
 
-    public void setCurrentMusicInfo(String url, String title, String artist, String imageUrl) {
+    public void setCurrentMusicInfo(String currentMusicID,String url, String title, String artist, String imageUrl) {
+        this.currentMusicId = currentMusicID;
         this.currentMusicUrl = url;
         this.currentMusicTitle = title;
         this.currentMusicArtist = artist;
         this.currentImageUrl = imageUrl;
-        this.shouldAutoPlay = true;  // Important: Set this to true
+        this.shouldAutoPlay = true;  
+    }
+
+    
+    public void setMusic(Music music) {
+        if (music != null) {
+            currentMusicId = music.getMusicId(); 
+            
+        }
+    }
+
+    
+    public String getCurrentMusicId() {
+        return currentMusicId;
     }
 
     public String getCurrentMusicUrl() { return currentMusicUrl; }
@@ -105,12 +159,14 @@ public class MediaPlayerManager {
     public void pauseMusic() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
+            notifyPlaybackStateChange(false);
         }
     }
 
     public void resumeMusic() {
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
+            notifyPlaybackStateChange(true);
         }
     }
 
@@ -125,6 +181,7 @@ public class MediaPlayerManager {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
+            notifyPlaybackStateChange(false);
         }
         if (context != null) {
             context.stopService(serviceIntent);
@@ -161,5 +218,21 @@ public class MediaPlayerManager {
 
     public boolean isCurrentSong(String url) {
         return url != null && url.equals(currentMusicUrl);
+    }
+
+    public boolean isPrepared() {
+        return isPrepared;
+    }
+
+    public void setRepeat(boolean repeat) {
+        isRepeatEnabled = repeat;
+        // Set MediaPlayer's looping state
+        if (mediaPlayer != null) {
+            mediaPlayer.setLooping(repeat);
+        }
+    }
+
+    public boolean isRepeatEnabled() {
+        return isRepeatEnabled;
     }
 }

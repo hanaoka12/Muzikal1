@@ -157,6 +157,7 @@ public class ProfileFragment extends Fragment implements MusicAdapter.OnMusicCli
 
                 // Set music info first
                 playerManager.setCurrentMusicInfo(
+                        selectedMusic.getMusicId(),
                         selectedMusic.getFileUrl(),
                         selectedMusic.getTitle(),
                         selectedMusic.getArtist(),
